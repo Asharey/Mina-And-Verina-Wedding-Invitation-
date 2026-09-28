@@ -533,6 +533,22 @@ html::before{background:repeating-linear-gradient(115deg,transparent 0,transpare
 .hero .hero-eyebrow{color:#F7DDA0;font-size:1.05rem;font-weight:600;letter-spacing:.38em;text-shadow:0 1px 2px rgba(20,12,4,.85),0 2px 14px rgba(20,12,4,.7);margin-bottom:10px;}
 :root[dir="rtl"] .hero .hero-eyebrow{letter-spacing:.04em;font-size:1.25rem;}
 .hero::after{background:linear-gradient(to bottom,rgba(40,30,18,.10) 0%,rgba(40,30,18,.02) 38%,rgba(30,22,12,.72) 100%);}
+
+/* couple photo: shift the picture up inside its frame so the couple sits higher and their feet aren't cropped */
+.couple-photo img{object-position:50% 88% !important;}
+
+/* location cards: keep both cards aligned (title, time box and button line up side by side) */
+.loc-card2{display:flex;flex-direction:column;}
+.loc-body{flex:1;display:flex;flex-direction:column;align-items:center;}
+.loc-btn2{margin-top:auto;}
+.loc-timebox{width:100%;}
+.loc-btn2{align-self:center;}
+.loc-timebox+.loc-btn2{margin-top:20px;}
+@media (min-width:720px){
+  .loc-name2{min-height:2.5em;display:flex;align-items:center;justify-content:center;}
+  .loc-btn2{margin-top:auto;}
+  .loc-timebox{margin-bottom:20px;}
+}
 </style>
 </head>
 <body>
@@ -946,7 +962,29 @@ html::before{background:repeating-linear-gradient(115deg,transparent 0,transpare
   const translations={"1 John 4:12":"يوحنا الأولى 4:12","5:00 PM":"5:00 مساءً","6:30 PM":"6:30 مساءً","On this beautiful day, we want to share with you the joy, warmth, and quiet certainty of our love story as we begin our new life together. Your presence has shaped who we are, and your presence at our wedding would mean the world to us.":"في هذا اليوم الجميل، نود أن نشارككم فرحة قصّة حبنا ودفئها ويقينها الهادئ، ونحن نبدأ حياتنا الجديدة معًا. لقد أسهم حضوركم في تشكيل من نكون، وسيعني حضوركم في حفل زفافنا العالم كله لنا.","\"If we love one another, God dwelleth in us, and his love is perfected in us.\"":"\"إِنْ أَحَبَّ بَعْضُنَا بَعْضًا، فَاللهُ يَثْبُتُ فِينَا، وَمَحَبَّتُهُ قَدْ تَكَمَّلَتْ فِينَا\"","Mina & Verina":"مينا وفيرينا","Mina Atef":"مينا عاطف","Verina Refaat":"فيرينا رفعت","Leave a sweet note or wishes for Mina & Verina...":"اكتبوا رسالة جميلة أو أمنية لمينا وفيرينا...","This invitation is exclusively for you": "هذه الدعوة لك حصريًا", "TAP TO OPEN": "اضغط للفتح", "GETTING MARRIED": "نحتفل بزفافنا", "12 November 2026": "12 نوفمبر 2026", "SCROLL TO DISCOVER": "مرر لاكتشاف المزيد", "SAVE THE DATE": "احفظوا التاريخ", "November 2026": "نوفمبر 2026", "SUN": "الأحد", "MON": "الاثنين", "TUE": "الثلاثاء", "WED": "الأربعاء", "THU": "الخميس", "FRI": "الجمعة", "SAT": "السبت", "We can't wait to celebrate with you": "لا نستطيع الانتظار للاحتفال معكم", "WITH LOVE": "بكل حب", "Dear Family & Friends": "عائلتنا وأصدقاؤنا الأعزاء", "COUNTING DOWN": "العد التنازلي", "Until We Say Yes to Forever": "حتى نقول نعم للأبد", "The most special day of our lives": "أجمل يوم في حياتنا", "DAYS": "يوم", "HOURS": "ساعة", "MINUTES": "دقيقة", "SECONDS": "ثانية", "TWO HEARTS": "قلبان", "One Story": "حكاية واحدة", "The Groom": "العريس", "The Bride": "العروس", "WHERE WE CELEBRATE": "مكان الاحتفال", "Join Us": "انضموا إلينا", "The places where our forever begins": "حيث تبدأ حكايتنا إلى الأبد", "CHURCH CEREMONY": "مراسم الكنيسة", "Church of Archangel Michael": "كنيسة الملاك ميخائيل", "SHERATON, CAIRO": "شيراتون، القاهرة", "CEREMONY": "المراسم", "CHURCH LOCATION": "موقع الكنيسة", "WEDDING RECEPTION": "حفل الاستقبال", "Ravenala Villa": "فيلا رافينالا", "CAIRO, EGYPT": "القاهرة، مصر", "RECEPTION": "الاستقبال", "To Follow": "يليه لاحقًا", "VENUE LOCATION": "موقع المكان", "RSVP": "تأكيد الحضور", "Leave Us a Message": "اتركوا لنا رسالة", "Your Name": "اسمك", "Will You Attend?": "هل ستحضر؟", "Yes, I'll be there": "نعم، سأحضر", "Sorry, I can't come": "عذرًا، لن أستطيع الحضور", "Write a Message": "اكتب رسالة", "SEND WITH LOVE": "أرسل بكل حب", "Your presence is the greatest gift of all": "وجودكم هو أجمل هدية لنا"}, inverse=Object.fromEntries(Object.entries(translations).map(([en,ar])=>[ar,en]));
   const root=document.documentElement, button=document.getElementById('language-switcher');
   let arabic=false;
+  /* digits: 0-9 <-> Arabic-Indic (٠-٩), also keeps the live countdown converted */
+  const AR_DIGITS='٠١٢٣٤٥٦٧٨٩';
+  const toArabicDigits=t=>t.replace(/[0-9]/g,d=>AR_DIGITS[d]);
+  const toLatinDigits=t=>t.replace(/[٠-٩]/g,d=>String(AR_DIGITS.indexOf(d)));
+  function convertDigits(toArabic){
+    const conv=toArabic?toArabicDigits:toLatinDigits;
+    const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    const list=[]; while(w.nextNode()) list.push(w.currentNode);
+    list.forEach(n=>{
+      const par=n.parentElement;
+      if(!par||['SCRIPT','STYLE'].includes(par.tagName)) return;
+      const v=conv(n.nodeValue);
+      if(v!==n.nodeValue) n.nodeValue=v;
+    });
+  }
+  const digitObserver=new MutationObserver(function(){
+    if(!arabic) return;
+    digitObserver.disconnect();
+    convertDigits(true);
+    digitObserver.observe(document.body,{childList:true,characterData:true,subtree:true});
+  });
   function applyLanguage(){
+    if(!arabic) convertDigits(false);
     const dictionary=arabic?translations:inverse;
     const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
     const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
@@ -968,6 +1006,12 @@ html::before{background:repeating-linear-gradient(115deg,transparent 0,transpare
     document.querySelectorAll('.hero-names').forEach(el=>{el.innerHTML=arabic?'مينا<span class="hero-and">و</span>فيرينا':'Mina<span class="hero-and">&amp;</span>Verina';});
     button.textContent=arabic?'English':'العربية';
     button.setAttribute('aria-label',arabic?'Switch to English':'التبديل إلى العربية');
+    if(arabic){
+      convertDigits(true);
+      digitObserver.observe(document.body,{childList:true,characterData:true,subtree:true});
+    } else {
+      digitObserver.disconnect();
+    }
   }
   button.addEventListener('click',function(){arabic=!arabic; applyLanguage();});
   button.addEventListener('touchend',function(event){event.preventDefault();arabic=!arabic;applyLanguage();},{passive:false});
