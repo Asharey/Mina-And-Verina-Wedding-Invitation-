@@ -1003,12 +1003,11 @@ html::before{background:repeating-linear-gradient(115deg,transparent 0,transpare
         showToast('error');
         return;
       }
+      /* show the thank-you popup instantly on touch, send to the sheet in the background */
+      showToast('ok');
+      nameEl.value = ''; msgEl.value = '';
       sendBtn.disabled = true; sendBtn.style.opacity = '.6';
       fetch(SHEET_ENDPOINT, { method:'POST', mode:'no-cors', body: body })
-        .then(function(){
-          showToast('ok');
-          nameEl.value = ''; msgEl.value = '';
-        })
         .catch(function(){ showToast('error'); })
         .then(function(){ sendBtn.disabled = false; sendBtn.style.opacity = ''; });
     });
